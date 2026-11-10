@@ -1,0 +1,9 @@
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch==2.8.0
+torchaudio==2.8.0
+audio-separator[gpu]==0.48.0
+imageio-ffmpeg
+sv-ttk
+tkinterdnd2
+pillow
+pyinstaller

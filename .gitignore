@@ -1,0 +1,20 @@
+# virtual environments
+.venv/
+.venv-gpu/
+# build output
+build/
+dist/
+*.spec
+*.log
+_keep_*
+# runtime data (portable app folder)
+models/
+output/
+kimenet/
+ffmpeg/
+jobs.json
+settings.json
+*.tmp
+# python
+__pycache__/
+*.pyc
