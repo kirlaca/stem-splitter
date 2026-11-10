@@ -25,7 +25,11 @@ is available, and has a modern light/dark UI.
 - **Portable.** Models, output, queue and settings all live next to the exe. Copy the folder anywhere.
 
 ## Download & run
-Grab a release build (or build it yourself, see below) and run `StemSplitter.exe`.
+**[⬇ Download StemSplitter v1.0.0 (CPU build, 338 MB)](https://github.com/kirlaca/stem-splitter/releases/download/v1.0.0/StemSplitter-v1.0.0-win64-cpu.zip)**
+— or see [all releases](https://github.com/kirlaca/stem-splitter/releases).
+
+Extract the zip anywhere and run `StemSplitter.exe`. No installation or Python needed.
+The GPU build is too large for GitHub releases; build it yourself with `build.bat gpu` (see below).
 
 | Build | Size | Runs on |
 |---|---|---|
