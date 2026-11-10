@@ -7,12 +7,17 @@ is available, and has a modern light/dark UI.
 ![StemSplitter – dark theme](docs/screenshot-dark.png)
 
 ## Features
-- **Three models to choose from**
+- **Three recommended models**
   | Model | Stems | Best for |
   |---|---|---|
   | BS-RoFormer (`model_bs_roformer_ep_317_sdr_12.9755`) | vocals, instrumental | cleanest vocals, karaoke, a cappella |
   | Demucs `htdemucs_ft` | vocals, drums, bass, other | best 4-stem quality |
   | Demucs `htdemucs_6s` | + guitar, piano | when guitar/piano matter |
+- **~170 more models.** *More models…* lists every model
+  [audio-separator](https://github.com/nomadkaraoke/python-audio-separator) supports (Roformer, MDX23C,
+  MDX-Net, Demucs, VR), with stems, SDR scores and upload date. You can search, sort, download or delete
+  them. Examples: newer MelBand Roformer vocal models, karaoke (lead/backing vocals), drum kit separation,
+  de-reverb, denoise.
 - **Job queue.** Add files or whole folders (drag & drop supported), set the parameters, and let the queue run.
   Each job runs in its own process, so it can be stopped instantly. The queue survives restarts and can
   optionally resume on launch.
@@ -28,7 +33,7 @@ is available, and has a modern light/dark UI.
   [Magyar](https://htmlpreview.github.io/?https://github.com/kirlaca/stem-splitter/blob/main/docs/user_guide_hu.html)
 
 ## Download & run
-**[⬇ Download StemSplitter v1.0.2 (CPU build, 338 MB)](https://github.com/kirlaca/stem-splitter/releases/download/v1.0.2/StemSplitter-v1.0.2-win64-cpu.zip)**
+**[⬇ Download StemSplitter v1.1.0 (CPU build, 338 MB)](https://github.com/kirlaca/stem-splitter/releases/download/v1.1.0/StemSplitter-v1.1.0-win64-cpu.zip)**
 — or see [all releases](https://github.com/kirlaca/stem-splitter/releases).
 
 Extract the zip anywhere and run `StemSplitter.exe`. No installation or Python needed.

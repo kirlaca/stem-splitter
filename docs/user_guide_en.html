@@ -68,12 +68,45 @@ opens this guide.</p>
 <div class="note">Tip: for the vocals alone, use RoFormer. For the instruments, use one of the Demucs models.
 You can queue the same song with several models.</div>
 
+<h3 id="more">More models</h3>
+<p>Besides the three recommended models, you can use any of the ~170 models the separation engine supports.
+Click <span class="ui">More models…</span> in the <b>Model</b> card (or in the <span class="ui">⟳ Models</span> window).
+The list shows for every model:</p>
+<table>
+  <tr><th>Column</th><th>Meaning</th></tr>
+  <tr><td class="ui">Model</td><td>Name of the model, usually with its author (e.g. “… by unwa”).</td></tr>
+  <tr><td class="ui">Type</td><td>Model family: Roformer, MDX23C, MDX-Net, Demucs v4 or VR.</td></tr>
+  <tr><td class="ui">Stems</td><td>What the model produces. Empty (—) means the stems are not listed. Then every output is saved.</td></tr>
+  <tr><td class="ui">Vocals SDR / Instr. SDR</td><td>Quality measured on a test set, in dB. Higher is better.
+      Empty means not measured.</td></tr>
+  <tr><td class="ui">Uploaded</td><td>When the model file was published in its download repository. This is close to
+      the model's release, but a model may have been shared elsewhere a little earlier.</td></tr>
+  <tr><td class="ui">Status</td><td><b>✔ downloaded</b> if the model files are already in the <code>models</code> folder
+      (these rows are green).</td></tr>
+</table>
+<ul>
+  <li>Click a column heading to sort by it (click again to reverse). The default order is newest first.</li>
+  <li><span class="ui">Search</span> filters by name, type, author or stem (e.g. <i>karaoke</i>, <i>reverb</i>,
+      <i>drum</i>, <i>unwa</i>). The drop-down shows only vocal/instrumental models, models with 3 or more stems,
+      or downloaded models.</li>
+  <li><span class="ui">✔ Use selected model</span> (or a double-click) selects the model. It then appears as
+      <b>Other model</b> in the Model card, with its own stem checkboxes.</li>
+  <li><span class="ui">⬇ Download</span> downloads the model in advance (as a queue job).
+      <span class="ui">🗑 Delete files</span> removes it from the disk.</li>
+  <li><span class="ui">⟳ Refresh list</span> fetches the newest model list from the internet.</li>
+</ul>
+<p>Some useful special models: <i>Karaoke</i> models (lead vocals vs. backing vocals), <i>DrumSep</i>
+(kick, snare, toms, hi-hat, ride, crash), <i>DeEcho / DeReverb</i> (removes echo and reverb),
+<i>Denoise</i> (removes noise). The newer <i>MelBand Roformer</i> vocal models have the highest vocal SDR.</p>
+<div class="note">The <b>Quality</b> setting applies to Roformer, MDX23C and Demucs models. MDX-Net and VR models
+use their own default settings.</div>
+
 <h2 id="workflow">3. Separating songs step by step</h2>
 <ol>
   <li><b>Input:</b> drag audio files or whole folders onto the drop area. You can also click it, or use
       <span class="ui">Add files…</span> / <span class="ui">Add folder…</span>. <span class="ui">Clear</span> empties the list.
       Supported formats: MP3, WAV, FLAC, M4A, OGG, AAC, WMA, OPUS, AIFF.</li>
-  <li><b>Model:</b> pick one of the three models (see above).</li>
+  <li><b>Model:</b> pick one of the three recommended models, or another one with <span class="ui">More models…</span> (see above).</li>
   <li><b>Output:</b> tick the stems you want to keep, then choose the folder, format, quality and device.</li>
   <li>Click <span class="ui">＋ Add to queue</span>. Every file becomes a separate job.</li>
   <li>Click <span class="ui">▶ Start</span>. Progress shows below the queue. When a job is done, double-click it to open its folder.</li>
@@ -116,7 +149,9 @@ Select a job to see its detailed log in the <b>Log</b> panel at the bottom.
 The queue is saved and is still there after you close and reopen the app.</p>
 
 <h2 id="manager">6. Model manager</h2>
-<p><span class="ui">⟳ Models</span> lists the three models with their download status, size and date.</p>
+<p><span class="ui">⟳ Models</span> lists the three recommended models with their download status, size and date.
+<span class="ui">More models…</span> opens the full model list, where every other model can be downloaded or deleted
+(see <a href="#more">More models</a>).</p>
 <ul>
   <li><span class="ui">⬇ Download missing</span>: downloads every model that is not on disk yet. Use it before going offline.</li>
   <li><span class="ui">⟳ Re-download selected</span>: downloads the selected models again, to update or repair them.
@@ -127,7 +162,7 @@ The queue is saved and is still there after you close and reopen the app.</p>
 shows in the queue.</p>
 
 <h2 id="builds">7. CPU build vs. GPU build</h2>
-<p>There are two builds of StemSplitter. <b>Both use exactly the same three models and the same program code.</b>
+<p>There are two builds of StemSplitter. <b>Both use exactly the same models and the same program code.</b>
 They differ only in the computing libraries bundled with them:</p>
 <table>
   <tr><th></th><th>CPU build (<code>StemSplitter</code>)</th><th>GPU build (<code>StemSplitter-GPU</code>)</th></tr>
@@ -159,7 +194,7 @@ current PyTorch (for example a GT 710). Choosing <span class="ui">CPU only</span
 <p>Everything is stored next to <code>StemSplitter.exe</code>, so you can copy or move the whole folder:</p>
 <pre>StemSplitter\
 ├── StemSplitter.exe
-├── models\          downloaded model files
+├── models\          downloaded model files and the model list
 ├── output\          default result folder
 ├── ffmpeg\          audio decoder/encoder
 ├── jobs.json        the saved queue

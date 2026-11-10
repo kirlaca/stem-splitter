@@ -36,6 +36,7 @@ STATUS_TEXT = {WAITING: "○  Waiting", RUNNING: "▶  Running", DONE: "✔  Don
                FAILED: "✖  Failed", STOPPED: "■  Stopped"}
 QUALITY = {"Fast": (1, 2), "Normal": (2, 4), "Best": (5, 8)}   # (demucs shifts, roformer overlap)
 DEVICES = ["Auto (GPU if available)", "CPU only"]
+CAT_FILTERS = ["All models", "Vocals / instrumental", "3+ stems", "Downloaded"]
 
 PALETTE = {
     "light": {"muted": "#6b6b6b", "drop": "#f3f3f3", "drop_hi": "#e3eefc", "log_bg": "#fafafa",
@@ -43,6 +44,11 @@ PALETTE = {
     "dark": {"muted": "#a0a0a0", "drop": "#2b2b2b", "drop_hi": "#1f3a5a", "log_bg": "#1c1c1c",
              "log_fg": "#d6d6d6", "ok": "#6ccb5f", "err": "#ff99a4", "run": "#60cdff", "stop": "#fce100"},
 }
+
+
+def short_type(t):
+    """'VR Arch Single Model v5' -> 'VR v5', 'Roformer Model' -> 'Roformer'."""
+    return (t or "").replace(" Arch Single Model", "").replace(" Model", "")
 
 
 def fmt_dur(sec):
@@ -190,7 +196,7 @@ class App:
         left = ttk.Frame(h)
         left.pack(side="left")
         ttk.Label(left, text=APP_NAME, style="Title.TLabel").pack(anchor="w")
-        ttk.Label(left, text="AI music source separation  ·  BS-RoFormer & Demucs  ·  GPU used automatically "
+        ttk.Label(left, text="AI music source separation  ·  RoFormer, Demucs & 160+ more models  ·  GPU used automatically "
                              "when available", style="Sub.TLabel").pack(anchor="w")
         self.theme_btn = ttk.Button(h, text="", width=10, command=self.toggle_theme)
         self.theme_btn.pack(side="right", anchor="n", pady=4)
@@ -244,10 +250,20 @@ class App:
         card, body, _ = self._card(grid, "2", "Model")
         card.grid(row=1, column=0, sticky="nsew", padx=(0, 5))
         self.model_var = tk.StringVar(value=c.get("model", "roformer"))
+        self.custom = c.get("custom_model")   # model picked in "More models…"
         for key, spec in MODELS.items():
             ttk.Radiobutton(body, text=f"{spec['title']}  ·  {spec['name']}", value=key, variable=self.model_var,
                             style="Model.TRadiobutton", command=self._model_changed).pack(anchor="w", pady=(4, 0))
             ttk.Label(body, text=spec["desc"], style="Small.TLabel").pack(anchor="w", padx=(30, 0))
+        row = ttk.Frame(body)
+        row.pack(fill="x", pady=(4, 0))
+        self.custom_rb = ttk.Radiobutton(row, text="Other model", value="custom", variable=self.model_var,
+                                         style="Model.TRadiobutton", command=self._model_changed)
+        self.custom_rb.pack(side="left")
+        ttk.Button(row, text="More models…", command=self.catalog_dialog).pack(side="right")
+        self.custom_lbl = ttk.Label(body, text="", style="Small.TLabel", wraplength=380)
+        self.custom_lbl.pack(anchor="w", padx=(30, 0))
+        self._show_custom()
 
         # 3 – output
         card, body, _ = self._card(grid, "3", "Output")
@@ -399,27 +415,52 @@ class App:
         if d:
             self.out_var.set(d)
 
+    def _show_custom(self):
+        if self.custom:
+            c = self.custom
+            txt = f"{c['name']}  ·  {short_type(c.get('type'))}" + (f"  ·  uploaded {c['date']}" if c.get("date") else "")
+            self.custom_rb.configure(state="normal")
+        else:
+            txt = "Pick from the full model list: newer vocal models, karaoke, drum kit, de-reverb, …"
+            self.custom_rb.configure(state="disabled")
+        self.custom_lbl.configure(text=txt)
+
     def _model_changed(self):
         for w in self.stem_box.winfo_children():
             w.destroy()
         key = self.model_var.get()
-        if key not in MODELS:
+        if key not in MODELS and not (key == "custom" and self.custom):
             key = "roformer"
             self.model_var.set(key)
-        saved = self.saved_stems.get(key)
+        if key == "custom":
+            stems = [worker.stem_label(x) for x in self.custom["stems"]]
+            self._stem_key = "custom:" + self.custom["file"]
+        else:
+            stems, self._stem_key = MODELS[key]["stems"], key
+        saved = self.saved_stems.get(self._stem_key)
         self.stem_vars = {}
-        for st in MODELS[key]["stems"]:
-            v = tk.BooleanVar(value=(st in saved) if saved is not None else True)
-            self.stem_vars[st] = v
-            ttk.Checkbutton(self.stem_box, text=st, variable=v, command=self._remember_stems).pack(side="left",
-                                                                                                padx=(0, 4))
+        if not stems:
+            ttk.Label(self.stem_box, text="all outputs of this model are saved", style="Small.TLabel").pack(
+                side="left", pady=5)
+        if len(stems) > 4:   # many stems (e.g. drum kit): smaller rows
+            rows = [stems[:len(stems) // 2 + len(stems) % 2], stems[len(stems) // 2 + len(stems) % 2:]]
+        else:
+            rows = [stems]
+        for r in rows:
+            fr = ttk.Frame(self.stem_box)
+            fr.pack(anchor="w")
+            for st in r:
+                v = tk.BooleanVar(value=(st in saved) if saved is not None else True)
+                self.stem_vars[st] = v
+                ttk.Checkbutton(fr, text=st, variable=v, command=self._remember_stems).pack(side="left", padx=(0, 4))
 
     def _remember_stems(self):
-        self.saved_stems[self.model_var.get()] = [s for s, v in self.stem_vars.items() if v.get()]
+        self.saved_stems[self._stem_key] = [s for s, v in self.stem_vars.items() if v.get()]
 
     def _save_settings(self):
         self._remember_stems()
-        self.cfg.update(model=self.model_var.get(), stems=self.saved_stems, output_dir=self.out_var.get(),
+        self.cfg.update(model=self.model_var.get(), custom_model=self.custom, stems=self.saved_stems,
+                        output_dir=self.out_var.get(),
                         subfolder=self.sub_var.get(), format=self.fmt_var.get(), quality=self.qual_var.get(),
                         device=self.dev_var.get(), autostart=self.auto_var.get(), theme=self.theme)
         try:
@@ -432,15 +473,22 @@ class App:
             messagebox.showwarning(APP_NAME, "Add some audio files first (drop them or use “Add files…”).")
             return
         stems = [s for s, v in self.stem_vars.items() if v.get()]
-        if not stems:
+        if not self.stem_vars:
+            stems = ["all"]
+        elif not stems:
             messagebox.showwarning(APP_NAME, "Select at least one stem to save.")
             return
+        model, extra = self.model_var.get(), {}
+        if model == "custom":
+            c = self.custom
+            model = c["file"]
+            extra = {"spec": {"name": c["name"], "file": c["file"], "stems": c["stems"]}}
         out = self.out_var.get().strip() or DEFAULT_OUT
         q = self.qual_var.get()
         shifts, overlap = QUALITY.get(q, QUALITY["Normal"])
         for f in self.files:
             self.jobs.append({
-                "id": uuid.uuid4().hex[:10], "input": f, "model": self.model_var.get(), "stems": stems,
+                **extra, "id": uuid.uuid4().hex[:10], "input": f, "model": model, "stems": stems,
                 "output_dir": out, "subfolder": self.sub_var.get(), "format": self.fmt_var.get(),
                 "quality": q, "shifts": shifts, "overlap": overlap,
                 "device": "cpu" if self.dev_var.get() == "CPU only" else "auto",
@@ -467,9 +515,11 @@ class App:
     def row_values(j):
         if j.get("type") == "models":
             mode = "re-download" if j.get("mode") == "force" else "missing only"
-            return (f"⟳  Model update ({mode})", ", ".join(j["models"]), "—", "—",
+            names = [j.get("specs", {}).get(k, {}).get("name", k) for k in j["models"]]
+            return (f"⟳  Model update ({mode})", ", ".join(names), "—", "—",
                     STATUS_TEXT[j["status"]], j.get("info", ""))
-        return (os.path.basename(j["input"]), j["model"], ", ".join(j["stems"]), j["format"],
+        return (os.path.basename(j["input"]), j.get("spec", {}).get("name", j["model"]), ", ".join(j["stems"]),
+                j["format"],
                 STATUS_TEXT[j["status"]], j.get("info", ""))
 
     def refresh_tree(self):
@@ -583,12 +633,15 @@ class App:
                    command=lambda: self.queue_models("missing")).pack(side="left")
         ttk.Button(bt, text="⟳  Re-download selected",
                    command=lambda: self.queue_models("force")).pack(side="left", padx=6)
-        ttk.Button(bt, text="📁  Folder", command=self.open_models).pack(side="left")
+        ttk.Button(bt, text="📁  Folder", command=self.open_models).pack(side="left", padx=(0, 6))
+        ttk.Button(bt, text="More models…", command=self.catalog_dialog).pack(side="left")
         ttk.Button(bt, text="Close", command=d.destroy).pack(side="right")
         self._refresh_models_dialog()
         d.after(30, lambda: set_dark_titlebar(d, self.theme == "dark"))
 
     def _refresh_models_dialog(self):
+        if getattr(self, "cdlg", None) and self.cdlg.winfo_exists():
+            self._fill_catalog()
         if not (getattr(self, "mdlg", None) and self.mdlg.winfo_exists()):
             return
         p = PALETTE[self.theme]
@@ -604,22 +657,24 @@ class App:
         os.makedirs(d, exist_ok=True)
         os.startfile(d)
 
-    def queue_models(self, mode):
-        keys = [k for k, v in self.mdl_vars.items() if v.get()]
-        if mode == "missing":
-            st = worker.model_status()
-            keys = [k for k in keys if not st[k][0]]
-            if not keys:
-                messagebox.showinfo("Models", "The selected models are already downloaded.", parent=self.mdlg)
-                return
-        elif not keys:
-            messagebox.showwarning("Models", "Select at least one model.", parent=self.mdlg)
+    def queue_models(self, mode, keys=None, specs=None, parent=None):
+        parent = parent or self.mdlg
+        if keys is None:
+            keys = [k for k, v in self.mdl_vars.items() if v.get()]
+            if mode == "missing":
+                st = worker.model_status()
+                keys = [k for k in keys if not st[k][0]]
+                if not keys:
+                    messagebox.showinfo("Models", "The selected models are already downloaded.", parent=parent)
+                    return
+        if not keys:
+            messagebox.showwarning("Models", "Select at least one model.", parent=parent)
             return
-        elif not messagebox.askyesno("Re-download", f"Re-download {len(keys)} model(s) and the model list "
-                                     "from the source?\nIf a download fails, the old file is kept.",
-                                     parent=self.mdlg):
+        if mode == "force" and not messagebox.askyesno(
+                "Re-download", f"Re-download {len(keys)} model(s) and the model list from the source?\n"
+                               "If a download fails, the old file is kept.", parent=parent):
             return
-        j = {"id": uuid.uuid4().hex[:10], "type": "models", "mode": mode, "models": keys,
+        j = {"id": uuid.uuid4().hex[:10], "type": "models", "mode": mode, "models": keys, "specs": specs or {},
              "input": "", "output_dir": worker.models_dir(), "status": WAITING, "info": "",
              "added": time.strftime("%Y-%m-%d %H:%M")}
         k = next((i for i, x in enumerate(self.jobs) if x["status"] == WAITING), len(self.jobs))
@@ -628,6 +683,240 @@ class App:
         self.refresh_tree()
         self.status.configure(text="Model update queued.")
         self.start_queue()
+
+    # ------------------------------------------------------------ more models (catalog)
+    def catalog_dialog(self):
+        if getattr(self, "cdlg", None) and self.cdlg.winfo_exists():
+            self.cdlg.lift()
+            return
+        d = self.cdlg = tk.Toplevel(self.root)
+        d.title("More models")
+        d.transient(self.root)
+        d.geometry("1180x660")
+        d.minsize(900, 480)
+        fr = ttk.Frame(d, padding=16)
+        fr.pack(fill="both", expand=True)
+        top = ttk.Frame(fr)
+        top.pack(fill="x")
+        ttk.Label(top, text="More models", style="CardTitle.TLabel").pack(side="left")
+        self.cat_info = ttk.Label(top, text="", style="Small.TLabel")
+        self.cat_info.pack(side="left", padx=12)
+        self.cat_btn = ttk.Button(top, text="⟳  Refresh list", command=lambda: self.refresh_catalog(True))
+        self.cat_btn.pack(side="right")
+        ttk.Label(fr, text="Every model the separation engine supports. SDR = quality measured on a test set "
+                           "(dB, higher is better; empty = not measured). Uploaded = when the model file was "
+                           "published in its download repository. Double-click a model to use it.",
+                  style="Small.TLabel", wraplength=1100).pack(anchor="w", pady=(2, 8))
+        flt = ttk.Frame(fr)
+        flt.pack(fill="x", pady=(0, 8))
+        ttk.Label(flt, text="Search").pack(side="left")
+        self.cat_search = tk.StringVar()
+        ttk.Entry(flt, textvariable=self.cat_search, width=34).pack(side="left", padx=(6, 12))
+        self.cat_search.trace_add("write", lambda *a: self._fill_catalog())
+        self.cat_filter = tk.StringVar(value=CAT_FILTERS[0])
+        cb = ttk.Combobox(flt, textvariable=self.cat_filter, values=CAT_FILTERS, state="readonly", width=22)
+        cb.pack(side="left")
+        cb.bind("<<ComboboxSelected>>", lambda e: self._fill_catalog())
+
+        tf = ttk.Frame(fr)
+        tf.pack(fill="both", expand=True)
+        cols = [("name", "Model", 360, True), ("type", "Type", 150, False), ("stems", "Stems", 230, True),
+                ("sdr_vocals", "Vocals SDR", 85, False), ("sdr_instrumental", "Instr. SDR", 85, False),
+                ("date", "Uploaded", 95, False), ("status", "Status", 110, False)]
+        self.cat_tree = ttk.Treeview(tf, columns=[c[0] for c in cols], show="headings", selectmode="browse")
+        for col, t, w, st in cols:
+            self.cat_tree.heading(col, text=t, anchor="w", command=lambda c=col: self._sort_catalog(c))
+            self.cat_tree.column(col, width=w, stretch=st, anchor="w")
+        sb = ttk.Scrollbar(tf, command=self.cat_tree.yview)
+        self.cat_tree.configure(yscrollcommand=sb.set)
+        sb.pack(side="right", fill="y")
+        self.cat_tree.pack(fill="both", expand=True)
+        self.cat_tree.bind("<Double-1>", lambda e: self.use_catalog_model())
+        self.cat_tree.bind("<<TreeviewSelect>>", lambda e: self._cat_selected())
+
+        bt = ttk.Frame(fr)
+        bt.pack(fill="x", pady=(10, 0))
+        ttk.Button(bt, text="✔  Use selected model", style="Accent.TButton",
+                   command=self.use_catalog_model).pack(side="left")
+        ttk.Button(bt, text="⬇  Download", command=self.download_catalog_model).pack(side="left", padx=6)
+        ttk.Button(bt, text="🗑  Delete files", command=self.delete_catalog_model).pack(side="left")
+        ttk.Button(bt, text="Close", command=d.destroy).pack(side="right")
+        self.cat_sel = ttk.Label(fr, text="", style="Small.TLabel")
+        self.cat_sel.pack(anchor="w", pady=(6, 0))
+
+        self.cat_sort = getattr(self, "cat_sort", ("date", True))
+        self.catalog = worker.load_catalog()
+        self._fill_catalog()
+        if not self.catalog:
+            self.refresh_catalog(False)
+        d.after(30, lambda: set_dark_titlebar(d, self.theme == "dark"))
+
+    def refresh_catalog(self, force):
+        if getattr(self, "cat_proc", None) and self.cat_proc.is_alive():
+            return
+        self.cat_q = mp.Queue()
+        self.cat_proc = mp.Process(target=worker.run_catalog, args=(force, self.cat_q), daemon=True)
+        self.cat_proc.start()
+        self.cat_btn.configure(state="disabled")
+        self.cat_info.configure(text="Loading the model list…")
+        self.root.after(300, self._poll_catalog)
+
+    def _poll_catalog(self):
+        alive = getattr(self, "cdlg", None) and self.cdlg.winfo_exists()
+        finished = False
+        try:
+            while True:
+                _, kind, val = self.cat_q.get_nowait()
+                if kind == "phase" and alive:
+                    self.cat_info.configure(text=val)
+                elif kind == "done":
+                    finished = True
+                    self.catalog = worker.load_catalog()
+                    if alive:
+                        self._fill_catalog()
+                elif kind == "error":
+                    finished = True
+                    if alive:
+                        self.cat_info.configure(text="Could not load the model list.")
+                        messagebox.showerror("More models", "Could not load the model list (internet connection "
+                                             f"needed).\n\n{val}", parent=self.cdlg)
+        except queue.Empty:
+            pass
+        if not finished and not self.cat_proc.is_alive() and self.cat_q.empty():
+            finished = True
+            if alive:
+                self.cat_info.configure(text="Could not load the model list.")
+        if finished:
+            self.cat_proc.join(timeout=2)
+            if alive:
+                self.cat_btn.configure(state="normal")
+        else:
+            self.root.after(300, self._poll_catalog)
+
+    @staticmethod
+    def _model_on_disk(m):
+        md = worker.models_dir()
+        return all(os.path.isfile(os.path.join(md, f)) for f in m["files"])
+
+    def _sort_catalog(self, col):
+        cur, desc = self.cat_sort
+        self.cat_sort = (col, not desc if col == cur else col in ("sdr_vocals", "sdr_instrumental", "date"))
+        self._fill_catalog()
+
+    def _fill_catalog(self):
+        if not (getattr(self, "cdlg", None) and self.cdlg.winfo_exists()):
+            return
+        t = self.cat_tree
+        sel = t.selection()
+        t.delete(*t.get_children())
+        models = (self.catalog or {}).get("models", [])
+        if self.catalog:
+            self.cat_info.configure(text=f"{len(models)} models  ·  list updated {self.catalog['updated']}")
+        words = self.cat_search.get().lower().split()
+        flt = self.cat_filter.get()
+        col, desc = self.cat_sort
+        rows = []
+        for m in models:
+            hay = f"{m['name']} {m['type']} {m['file']} {' '.join(m['stems'])}".lower()
+            if any(w not in hay for w in words):
+                continue
+            on_disk = self._model_on_disk(m)
+            if flt == CAT_FILTERS[1] and set(m["stems"]) != {"vocals", "instrumental"}:
+                continue
+            if flt == CAT_FILTERS[2] and len(m["stems"]) < 3:
+                continue
+            if flt == CAT_FILTERS[3] and not on_disk:
+                continue
+            rows.append((m, on_disk))
+
+        def key(r):
+            v = r[0].get(col) if col != "status" else r[1]
+            if col == "stems":
+                v = len(r[0]["stems"])
+            if v is None or v == "":
+                return (1, 0) if not desc else (0, 0)
+            return (0 if not desc else 1, v)
+        rows.sort(key=lambda r: r[0]["name"].lower())
+        rows.sort(key=key, reverse=desc)
+        p = PALETTE[self.theme]
+        t.tag_configure("disk", foreground=p["ok"])
+        for m, on_disk in rows:
+            t.insert("", "end", iid=m["file"], tags=("disk",) if on_disk else (), values=(
+                m["name"], short_type(m["type"]), ", ".join(worker.stem_label(x) for x in m["stems"]) or "—",
+                f"{m['sdr_vocals']:.2f}" if m.get("sdr_vocals") else "",
+                f"{m['sdr_instrumental']:.2f}" if m.get("sdr_instrumental") else "",
+                m.get("date", ""), "✔  downloaded" if on_disk else ""))
+        for c_, title in [("name", "Model"), ("type", "Type"), ("stems", "Stems"), ("sdr_vocals", "Vocals SDR"),
+                          ("sdr_instrumental", "Instr. SDR"), ("date", "Uploaded"), ("status", "Status")]:
+            t.heading(c_, text=title + ("  ▼" if desc else "  ▲") * (c_ == col))
+        for i in sel:
+            if t.exists(i):
+                t.selection_set(i)
+                t.see(i)
+        self._cat_selected()
+
+    def _cat_entry(self):
+        sel = self.cat_tree.selection()
+        models = (self.catalog or {}).get("models", [])
+        return next((m for m in models if sel and m["file"] == sel[0]), None)
+
+    def _cat_selected(self):
+        m = self._cat_entry()
+        if not m:
+            self.cat_sel.configure(text="")
+            return
+        md = worker.models_dir()
+        mb = sum(os.path.getsize(os.path.join(md, f)) for f in m["files"] if os.path.isfile(os.path.join(md, f)))
+        self.cat_sel.configure(text=f"{m['name']}  ·  files: {', '.join(m['files'])}"
+                                    + (f"  ·  {mb / 1e6:.0f} MB on disk" if mb else "  ·  not downloaded"))
+
+    def use_catalog_model(self):
+        m = self._cat_entry()
+        if not m:
+            messagebox.showinfo("More models", "Select a model first.", parent=self.cdlg)
+            return
+        self.custom = {k: m.get(k) for k in ("name", "type", "file", "files", "stems", "date")}
+        self.model_var.set("custom")
+        self._show_custom()
+        self._model_changed()
+        self._save_settings()
+        self.status.configure(text=f"Model selected: {m['name']}" + ("" if self._model_on_disk(m) else
+                                                                     " (downloads on first use)"))
+        self.cdlg.destroy()
+
+    def download_catalog_model(self):
+        m = self._cat_entry()
+        if not m:
+            messagebox.showinfo("More models", "Select a model first.", parent=self.cdlg)
+            return
+        mode = "force" if self._model_on_disk(m) else "missing"
+        key = next((k for k, v in MODELS.items() if v["file"] == m["file"]), m["file"])
+        self.queue_models(mode, keys=[key], parent=self.cdlg,
+                          specs={key: {"name": m["name"], "file": m["file"], "stems": m["stems"]}})
+
+    def delete_catalog_model(self):
+        m = self._cat_entry()
+        if not m or not self._model_on_disk(m) and not any(
+                os.path.isfile(os.path.join(worker.models_dir(), f)) for f in m["files"]):
+            messagebox.showinfo("More models", "Select a downloaded model first.", parent=self.cdlg)
+            return
+        running = self.job(self.cur) if self.cur else None
+        if running and m["file"] in (running.get("model"), running.get("spec", {}).get("file"),
+                                     MODELS.get(running.get("model", ""), {}).get("file")):
+            messagebox.showwarning("More models", "This model is used by the running job.", parent=self.cdlg)
+            return
+        if not messagebox.askyesno("Delete files", f"Delete the files of “{m['name']}”?\n"
+                                   "It is downloaded again when you use it next time.", parent=self.cdlg):
+            return
+        shared = {f for x in self.catalog["models"] if x["file"] != m["file"] and self._model_on_disk(x)
+                  for f in x["files"]}   # e.g. a config file another downloaded model also needs
+        for f in m["files"]:
+            if f not in shared:
+                try:
+                    os.remove(os.path.join(worker.models_dir(), f))
+                except OSError:
+                    pass
+        self._refresh_models_dialog()
 
     # ------------------------------------------------------------ running
     def _buttons(self):

@@ -69,6 +69,39 @@ gomb ezt a leírást nyitja meg.</p>
 </table>
 <div class="note">Tipp: ha csak az ének kell, a RoFormert válaszd. Ha a hangszerek, akkor valamelyik Demucs modellt.
 Ugyanazt a dalt több modellel is betheted a sorba.</div>
+
+<h3 id="more">További modellek</h3>
+<p>A három ajánlott modell mellett a szétválasztó motor által támogatott ~170 modell bármelyike használható.
+Kattints a <b>Model</b> kártyán (vagy a <span class="ui">⟳ Models</span> ablakban) a <span class="ui">More models…</span>
+gombra. A lista minden modellnél mutatja:</p>
+<table>
+  <tr><th>Oszlop</th><th>Jelentése</th></tr>
+  <tr><td class="ui">Model</td><td>A modell neve, általában a készítőjével (pl. „… by unwa”).</td></tr>
+  <tr><td class="ui">Type</td><td>Modellcsalád: Roformer, MDX23C, MDX-Net, Demucs v4 vagy VR.</td></tr>
+  <tr><td class="ui">Stems</td><td>Milyen sávokat ad a modell. Üres (—), ha nincs megadva. Ilyenkor minden kimenet megmarad.</td></tr>
+  <tr><td class="ui">Vocals SDR / Instr. SDR</td><td>Tesztanyagon mért minőség dB-ben. A nagyobb a jobb.
+      Üres, ha nincs mérés.</td></tr>
+  <tr><td class="ui">Uploaded</td><td>Mikor került fel a modellfájl a letöltési tárhelyére. Ez közel van a modell
+      megjelenéséhez, de egy modellt máshol néha kicsit korábban is megosztottak.</td></tr>
+  <tr><td class="ui">Status</td><td><b>✔ downloaded</b>, ha a modell fájljai már a <code>models</code> mappában vannak
+      (ezek a sorok zöldek).</td></tr>
+</table>
+<ul>
+  <li>Egy oszlopfejlécre kattintva aszerint rendez (újabb kattintás: fordított sorrend). Alapértelmezés: a legújabb elöl.</li>
+  <li>A <span class="ui">Search</span> mező név, típus, készítő vagy sáv szerint szűr (pl. <i>karaoke</i>, <i>reverb</i>,
+      <i>drum</i>, <i>unwa</i>). A legördülő listával csak az ének/kíséret modellek, a 3 vagy több sávos modellek,
+      vagy a letöltött modellek jeleníthetők meg.</li>
+  <li>A <span class="ui">✔ Use selected model</span> (vagy dupla kattintás) kiválasztja a modellt. Ezután
+      <b>Other model</b> néven jelenik meg a Model kártyán, a saját sávjaival.</li>
+  <li>A <span class="ui">⬇ Download</span> előre letölti a modellt (feladatként a sorban).
+      A <span class="ui">🗑 Delete files</span> törli a lemezről.</li>
+  <li>A <span class="ui">⟳ Refresh list</span> letölti a legfrissebb modelllistát az internetről.</li>
+</ul>
+<p>Néhány hasznos különleges modell: <i>Karaoke</i> (fő ének és vokál szétválasztása), <i>DrumSep</i>
+(lábdob, pergő, tamok, hi-hat, ride, crash), <i>DeEcho / DeReverb</i> (visszhang és zengés eltávolítása),
+<i>Denoise</i> (zajszűrés). Az újabb <i>MelBand Roformer</i> ének modelleknek a legmagasabb az ének SDR értékük.</p>
+<div class="note">A <b>Quality</b> beállítás a Roformer, MDX23C és Demucs modellekre hat. Az MDX-Net és VR modellek
+a saját alapbeállításukkal futnak.</div>
 <p>A sávok angol neve a programban és a fájlnevekben: <i>vocals</i> (ének), <i>instrumental</i> (kíséret),
 <i>drums</i> (dob), <i>bass</i> (basszus), <i>other</i> (egyéb), <i>guitar</i> (gitár), <i>piano</i> (zongora).</p>
 
@@ -77,7 +110,7 @@ Ugyanazt a dalt több modellel is betheted a sorba.</div>
   <li><b>Input (bemenet):</b> húzd rá a hangfájlokat vagy akár egész mappákat a fogadó területre. Kattinthatsz is rá,
       vagy használd az <span class="ui">Add files…</span> / <span class="ui">Add folder…</span> gombot. A <span class="ui">Clear</span>
       kiüríti a listát. Támogatott formátumok: MP3, WAV, FLAC, M4A, OGG, AAC, WMA, OPUS, AIFF.</li>
-  <li><b>Model:</b> válaszd ki a három modell egyikét (lásd fent).</li>
+  <li><b>Model:</b> válaszd ki a három ajánlott modell egyikét, vagy a <span class="ui">More models…</span> gombbal egy másikat (lásd fent).</li>
   <li><b>Output (kimenet):</b> pipáld be a megtartandó sávokat, majd állítsd be a mappát, a formátumot, a minőséget és az eszközt.</li>
   <li>Kattints az <span class="ui">＋ Add to queue</span> gombra. Minden fájlból külön feladat lesz.</li>
   <li>Kattints a <span class="ui">▶ Start</span> gombra. A haladás a sor alatt látszik. Egy kész feladatra duplán kattintva
@@ -122,7 +155,9 @@ a futási időt és a használt eszközt (CPU vagy a GPU neve). Egy feladatot ki
 látszik a részletes napló. A sor elmentődik, a program újraindítása után is megmarad.</p>
 
 <h2 id="manager">6. Modellkezelő</h2>
-<p>A <span class="ui">⟳ Models</span> gomb listázza a három modellt a letöltési állapotukkal, méretükkel és dátumukkal.</p>
+<p>A <span class="ui">⟳ Models</span> gomb listázza a három ajánlott modellt a letöltési állapotukkal, méretükkel és dátumukkal.
+A <span class="ui">More models…</span> gomb a teljes modelllistát nyitja meg, ahol bármelyik másik modell letölthető
+vagy törölhető (lásd: <a href="#more">További modellek</a>).</p>
 <ul>
   <li><span class="ui">⬇ Download missing</span>: letölti azokat a modelleket, amelyek még nincsenek a gépen. Érdemes internet nélküli használat előtt.</li>
   <li><span class="ui">⟳ Re-download selected</span>: a kijelölt modelleket újra letölti, frissítéshez vagy javításhoz.
@@ -132,7 +167,7 @@ látszik a részletes napló. A sor elmentődik, a program újraindítása után
 <p>A letöltések is feladatként futnak. A várakozó szétválasztások elé kerülnek, és a haladásuk a sorban látszik.</p>
 
 <h2 id="builds">7. CPU-s és GPU-s változat</h2>
-<p>A StemSplitternek két változata van. <b>Mindkettő pontosan ugyanazt a három modellt és ugyanazt a programkódot használja.</b>
+<p>A StemSplitternek két változata van. <b>Mindkettő pontosan ugyanazokat a modelleket és ugyanazt a programkódot használja.</b>
 Csak a mellécsomagolt számítási könyvtárakban térnek el:</p>
 <table>
   <tr><th></th><th>CPU-s változat (<code>StemSplitter</code>)</th><th>GPU-s változat (<code>StemSplitter-GPU</code>)</th></tr>
@@ -162,7 +197,7 @@ PyTorch-hoz (pl. GT 710). A <span class="ui">CPU only</span> beállítás mindk�
 <p>Minden a <code>StemSplitter.exe</code> mellett tárolódik, így a teljes mappa másolható vagy áthelyezhető:</p>
 <pre>StemSplitter\
 ├── StemSplitter.exe
-├── models\          letöltött modellfájlok
+├── models\          letöltött modellfájlok és a modelllista
 ├── output\          alapértelmezett kimeneti mappa
 ├── ffmpeg\          hangdekóder/-kódoló
 ├── jobs.json        a mentett feladatsor
