@@ -134,7 +134,7 @@ They differ only in the computing libraries bundled with them:</p>
   <tr><td>PyTorch</td><td>2.8.0, CPU-only</td><td>2.8.0 with CUDA 12.8 (CUDA/cuDNN libraries included)</td></tr>
   <tr><td>ONNX Runtime</td><td><code>onnxruntime</code></td><td><code>onnxruntime-gpu</code></td></tr>
   <tr><td>Size</td><td>~0.9 GB</td><td>~5 GB (almost all of the difference is the CUDA libraries)</td></tr>
-  <tr><td>Hardware</td><td>Any 64-bit Windows 10/11 PC</td><td>NVIDIA GPU, GTX 900 series or newer, driver 570 or newer</td></tr>
+  <tr><td>Hardware</td><td>Any 64-bit Windows 10/11 PC</td><td>NVIDIA GPU, GTX 10 series (Pascal) or newer, driver 570 or newer. GTX 900 series and older cards are not supported.</td></tr>
   <tr><td>Uses the GPU</td><td>Never</td><td>Automatically, when a usable card is found</td></tr>
 </table>
 <h3>How the GPU build picks the device</h3>

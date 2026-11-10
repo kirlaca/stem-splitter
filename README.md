@@ -28,7 +28,7 @@ is available, and has a modern light/dark UI.
   [Magyar](https://htmlpreview.github.io/?https://github.com/kirlaca/stem-splitter/blob/main/docs/user_guide_hu.html)
 
 ## Download & run
-**[⬇ Download StemSplitter v1.0.1 (CPU build, 338 MB)](https://github.com/kirlaca/stem-splitter/releases/download/v1.0.1/StemSplitter-v1.0.1-win64-cpu.zip)**
+**[⬇ Download StemSplitter v1.0.2 (CPU build, 338 MB)](https://github.com/kirlaca/stem-splitter/releases/download/v1.0.2/StemSplitter-v1.0.2-win64-cpu.zip)**
 — or see [all releases](https://github.com/kirlaca/stem-splitter/releases).
 
 Extract the zip anywhere and run `StemSplitter.exe`. No installation or Python needed.
@@ -37,7 +37,7 @@ The GPU build is too large for GitHub releases; build it yourself with `build.ba
 | Build | Size | Runs on |
 |---|---|---|
 | `StemSplitter` (CPU) | ~0.9 GB | any 64-bit Windows 10/11 PC |
-| `StemSplitter-GPU` (CUDA 12.8) | ~5 GB | NVIDIA GPU (GTX 900 series or newer, driver ≥ 570); falls back to CPU otherwise |
+| `StemSplitter-GPU` (CUDA 12.8) | ~5 GB | NVIDIA GPU (GTX 10 series / Pascal or newer, driver ≥ 570); falls back to CPU otherwise |
 
 Models are downloaded on first use into the `models` folder (RoFormer ~640 MB, htdemucs_ft ~340 MB,
 htdemucs_6s ~55 MB). After that the app works offline.
