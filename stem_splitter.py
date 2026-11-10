@@ -194,7 +194,26 @@ class App:
                              "when available", style="Sub.TLabel").pack(anchor="w")
         self.theme_btn = ttk.Button(h, text="", width=10, command=self.toggle_theme)
         self.theme_btn.pack(side="right", anchor="n", pady=4)
+        self.help_btn = ttk.Button(h, text="?  Help", command=self.help_menu)
+        self.help_btn.pack(side="right", anchor="n", pady=4, padx=(8, 0))
         ttk.Button(h, text="⟳  Models", command=self.models_dialog).pack(side="right", anchor="n", pady=4, padx=8)
+
+    def help_menu(self):
+        m = tk.Menu(self.root, tearoff=0)
+        m.add_command(label="User guide (English)", command=lambda: self.open_guide("en"))
+        m.add_command(label="Felhasználói leírás (magyar)", command=lambda: self.open_guide("hu"))
+        b = self.help_btn
+        try:
+            m.tk_popup(b.winfo_rootx(), b.winfo_rooty() + b.winfo_height())
+        finally:
+            m.grab_release()
+
+    def open_guide(self, lang):
+        p = os.path.join(RES_DIR, "docs", f"user_guide_{lang}.html")
+        if os.path.isfile(p):
+            os.startfile(p)
+        else:
+            messagebox.showerror("Help", f"User guide not found:\n{p}")
 
     def _build_setup(self, parent):
         c = self.cfg

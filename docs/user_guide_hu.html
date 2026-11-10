@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StemSplitter – Felhasználói leírás</title>
+<style>
+  :root { --bg:#fafafa; --fg:#1c1c1c; --muted:#5f5f5f; --card:#fff; --line:#e3e3e3; --accent:#0067c0; --note:#eef5fc; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#1c1c1c; --fg:#e8e8e8; --muted:#a8a8a8; --card:#262626; --line:#3a3a3a; --accent:#57a6ff; --note:#1f2b38; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.6 "Segoe UI", system-ui, sans-serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 32px 24px 64px; }
+  h1 { font-size: 30px; margin: 0 0 4px; }
+  h2 { font-size: 21px; margin: 40px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+  h3 { font-size: 16px; margin: 22px 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 18px; }
+  .lang { float: right; font-size: 14px; }
+  a { color: var(--accent); }
+  nav { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px 20px; }
+  nav ol { margin: 0; padding-left: 20px; columns: 2; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; background: var(--card); }
+  th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--note); }
+  code, kbd { font-family: Consolas, monospace; font-size: 13.5px; background: var(--note); padding: 1px 5px; border-radius: 4px; }
+  .note { background: var(--note); border-left: 4px solid var(--accent); padding: 10px 14px; border-radius: 4px; margin: 14px 0; }
+  .ui { font-weight: 600; white-space: nowrap; }
+  pre { background: var(--card); border: 1px solid var(--line); padding: 10px 14px; border-radius: 6px; }
+</style>
+</head>
+<body>
+<main>
+<div class="lang"><a href="user_guide_en.html">English version »</a></div>
+<h1>StemSplitter – Felhasználói leírás</h1>
+<p class="sub">Zeneszámok sávokra bontása mesterséges intelligenciával, Windowsra · BS-RoFormer és Demucs</p>
+<p>A program felülete angol nyelvű. A leírásban a gombok és beállítások neve <span class="ui">félkövérrel</span>,
+a felületen látható angol formában szerepel.</p>
+
+<nav><ol>
+  <li><a href="#start">Első lépések</a></li>
+  <li><a href="#models">Modellválasztás</a></li>
+  <li><a href="#workflow">Szétválasztás lépésről lépésre</a></li>
+  <li><a href="#options">Kimeneti beállítások</a></li>
+  <li><a href="#queue">A feladatsor (Queue)</a></li>
+  <li><a href="#manager">Modellkezelő</a></li>
+  <li><a href="#builds">CPU-s és GPU-s változat</a></li>
+  <li><a href="#files">Fájlok és mappák</a></li>
+  <li><a href="#trouble">Hibaelhárítás</a></li>
+</ol></nav>
+
+<h2 id="start">1. Első lépések</h2>
+<p>A StemSplitter hordozható program, nem kell telepíteni. Csomagold ki a mappát bárhová (akár pendrive-ra is),
+és indítsd el a <code>StemSplitter.exe</code>-t. Python sem kell hozzá.</p>
+<p>Egy modell első használatakor a program letölti azt a <code>models</code> mappába, utána internet nélkül is működik.
+Ha minden modellt előre le szeretnél tölteni: <span class="ui">⟳ Models</span> → <span class="ui">⬇ Download missing</span>.</p>
+<p>A jobb felső <span class="ui">☀ Light / ☾ Dark</span> gomb a világos és sötét téma között vált. A <span class="ui">? Help</span>
+gomb ezt a leírást nyitja meg.</p>
+
+<h2 id="models">2. Modellválasztás</h2>
+<table>
+  <tr><th>Opció a programban</th><th>Kimeneti sávok</th><th>Mire való</th><th>Letöltés</th></tr>
+  <tr><td><b>Vocals / Instrumental</b><br>BS-RoFormer</td><td>ének, kíséret</td>
+      <td>A legtisztább énekleválasztás: karaoke, a cappella, remix</td><td>~640 MB</td></tr>
+  <tr><td><b>4 stems</b><br>Demucs htdemucs_ft</td><td>ének, dob, basszus, egyéb</td>
+      <td>A legjobb 4 sávos minőség, pl. zenekari gyakorláshoz. Lassabb, mert 4 külön modellt futtat.</td><td>~340 MB</td></tr>
+  <tr><td><b>6 stems</b><br>Demucs htdemucs_6s</td><td>ének, dob, basszus, egyéb, gitár, zongora</td>
+      <td>Ha a gitár vagy a zongora külön is kell. A gitár- és zongorasáv kevésbé tiszta, mint a többi.</td><td>~55 MB</td></tr>
+</table>
+<div class="note">Tipp: ha csak az ének kell, a RoFormert válaszd. Ha a hangszerek, akkor valamelyik Demucs modellt.
+Ugyanazt a dalt több modellel is betheted a sorba.</div>
+<p>A sávok angol neve a programban és a fájlnevekben: <i>vocals</i> (ének), <i>instrumental</i> (kíséret),
+<i>drums</i> (dob), <i>bass</i> (basszus), <i>other</i> (egyéb), <i>guitar</i> (gitár), <i>piano</i> (zongora).</p>
+
+<h2 id="workflow">3. Szétválasztás lépésről lépésre</h2>
+<ol>
+  <li><b>Input (bemenet):</b> húzd rá a hangfájlokat vagy akár egész mappákat a fogadó területre. Kattinthatsz is rá,
+      vagy használd az <span class="ui">Add files…</span> / <span class="ui">Add folder…</span> gombot. A <span class="ui">Clear</span>
+      kiüríti a listát. Támogatott formátumok: MP3, WAV, FLAC, M4A, OGG, AAC, WMA, OPUS, AIFF.</li>
+  <li><b>Model:</b> válaszd ki a három modell egyikét (lásd fent).</li>
+  <li><b>Output (kimenet):</b> pipáld be a megtartandó sávokat, majd állítsd be a mappát, a formátumot, a minőséget és az eszközt.</li>
+  <li>Kattints az <span class="ui">＋ Add to queue</span> gombra. Minden fájlból külön feladat lesz.</li>
+  <li>Kattints a <span class="ui">▶ Start</span> gombra. A haladás a sor alatt látszik. Egy kész feladatra duplán kattintva
+      megnyílik az eredmény mappája.</li>
+</ol>
+
+<h2 id="options">4. Kimeneti beállítások</h2>
+<table>
+  <tr><th>Beállítás</th><th>Jelentése</th></tr>
+  <tr><td class="ui">Stems</td><td>Csak a bepipált sávok maradnak meg, a többit a program a szétválasztás után törli.</td></tr>
+  <tr><td class="ui">Folder</td><td>Ide kerülnek az eredmények. Alapértelmezés: a program melletti <code>output</code> mappa.</td></tr>
+  <tr><td class="ui">Separate folder per song</td><td>Bekapcsolva: <code>output\Dalom\vocals.wav</code>.
+      Kikapcsolva: <code>output\Dalom_vocals.wav</code>.</td></tr>
+  <tr><td class="ui">Format</td><td>WAV (veszteségmentes, nagy), FLAC (veszteségmentes, kisebb) vagy MP3 (320 kbps).</td></tr>
+  <tr><td class="ui">Quality</td><td><b>Fast / Normal / Best</b>. Nagyobb minőségnél arányosan tovább tart a feldolgozás.
+      Demucsnál a „shifts” számát állítja (1 / 2 / 5), RoFormernél az átfedést (2 / 4 / 8).
+      A <i>Best</i> kb. 2–3-szor lassabb a <i>Normal</i>-nál, a különbség viszont kicsi. A <i>Normal</i> jó alapértelmezés.</td></tr>
+  <tr><td class="ui">Device</td><td><b>Auto (GPU if available)</b>: NVIDIA GPU-t használ, ha az működik, különben a processzort.
+      <b>CPU only</b>: mindig a processzort használja. Lásd: <a href="#builds">CPU-s és GPU-s változat</a>.</td></tr>
+</table>
+<p>A program megjegyzi a beállításokat. Minden feladat azokkal a beállításokkal fut, amelyekkel a sorba került,
+így egy későbbi módosítás nem érinti a már sorban lévő feladatokat.</p>
+
+<h2 id="queue">5. A feladatsor (Queue)</h2>
+<p>A feladatok sorban, egyenként futnak. Mindegyik külön folyamatban fut, ezért bármikor azonnal leállítható.</p>
+<table>
+  <tr><th>Vezérlő</th><th>Mit csinál</th></tr>
+  <tr><td class="ui">▶ Start</td><td>Elindítja a várakozó feladatok feldolgozását.</td></tr>
+  <tr><td class="ui">⏸ Pause after current</td><td>Az éppen futó feladatot még befejezi, utána megállítja a sort.</td></tr>
+  <tr><td class="ui">■ Stop current</td><td>Azonnal leállítja a futó feladatot (állapota: <i>Stopped</i>).</td></tr>
+  <tr><td class="ui">Resume on launch</td><td>Bekapcsolva a várakozó feladatok a program következő indításakor automatikusan elindulnak.</td></tr>
+  <tr><td class="ui">↻ Retry</td><td>A kijelölt kész, hibás vagy leállított feladatokat visszateszi várakozóba, pl. újrafuttatáshoz.</td></tr>
+  <tr><td class="ui">▲ ▼</td><td>A kijelölt feladatot feljebb vagy lejjebb viszi a sorban.</td></tr>
+  <tr><td class="ui">✕ Remove</td><td>Törli a kijelölt feladatokat (vagy nyomd meg a <kbd>Delete</kbd> billentyűt).</td></tr>
+  <tr><td class="ui">Clear finished</td><td>Az összes kész, hibás és leállított feladatot eltávolítja a listából.</td></tr>
+  <tr><td class="ui">📁 Open output</td><td>Megnyitja a kijelölt feladat eredménymappáját (vagy kattints duplán a feladatra).
+      Ha nincs kijelölés, a kimeneti mappát nyitja meg.</td></tr>
+</table>
+<p>Állapotok: <b>○ Waiting</b> (várakozik), <b>▶ Running</b> (fut), <b>✔ Done</b> (kész), <b>✖ Failed</b> (hiba),
+<b>■ Stopped</b> (leállítva). Futás közben az <i>Info</i> oszlop a fázist és a haladást mutatja, utána a sávok számát,
+a futási időt és a használt eszközt (CPU vagy a GPU neve). Egy feladatot kijelölve alul, a <b>Log</b> panelen
+látszik a részletes napló. A sor elmentődik, a program újraindítása után is megmarad.</p>
+
+<h2 id="manager">6. Modellkezelő</h2>
+<p>A <span class="ui">⟳ Models</span> gomb listázza a három modellt a letöltési állapotukkal, méretükkel és dátumukkal.</p>
+<ul>
+  <li><span class="ui">⬇ Download missing</span>: letölti azokat a modelleket, amelyek még nincsenek a gépen. Érdemes internet nélküli használat előtt.</li>
+  <li><span class="ui">⟳ Re-download selected</span>: a kijelölt modelleket újra letölti, frissítéshez vagy javításhoz.
+      A régi fájl megmarad, amíg az új meg nem érkezik, így egy sikertelen letöltés után sem maradsz modell nélkül.</li>
+  <li><span class="ui">📁 Folder</span>: megnyitja a <code>models</code> mappát.</li>
+</ul>
+<p>A letöltések is feladatként futnak. A várakozó szétválasztások elé kerülnek, és a haladásuk a sorban látszik.</p>
+
+<h2 id="builds">7. CPU-s és GPU-s változat</h2>
+<p>A StemSplitternek két változata van. <b>Mindkettő pontosan ugyanazt a három modellt és ugyanazt a programkódot használja.</b>
+Csak a mellécsomagolt számítási könyvtárakban térnek el:</p>
+<table>
+  <tr><th></th><th>CPU-s változat (<code>StemSplitter</code>)</th><th>GPU-s változat (<code>StemSplitter-GPU</code>)</th></tr>
+  <tr><td>PyTorch</td><td>2.8.0, csak CPU</td><td>2.8.0 CUDA 12.8-cal (benne vannak a CUDA/cuDNN könyvtárak)</td></tr>
+  <tr><td>ONNX Runtime</td><td><code>onnxruntime</code></td><td><code>onnxruntime-gpu</code></td></tr>
+  <tr><td>Méret</td><td>~0,9 GB</td><td>~5 GB (a különbség szinte csak a CUDA könyvtárak)</td></tr>
+  <tr><td>Hardver</td><td>Bármilyen 64 bites Windows 10/11 gép</td><td>NVIDIA GPU, GTX 900-as sorozat vagy újabb, 570-es vagy újabb driver</td></tr>
+  <tr><td>GPU használat</td><td>Soha</td><td>Automatikusan, ha talál alkalmas kártyát</td></tr>
+</table>
+<h3>Hogyan választ eszközt a GPU-s változat?</h3>
+<p>A GPU-s változat minden feladat elején lefuttat egy kis próbaszámítást a videókártyán. Ha ez sikerül, a feladat
+a GPU-n fut, és az <i>Info</i> oszlopban a kártya neve látszik. Ha nem sikerül, a feladat a CPU-n fut, pontosan úgy,
+mint a CPU-s változatban. Ez történik, ha nincs NVIDIA kártya, ha elavult a driver, vagy ha a kártya túl régi a mai
+PyTorch-hoz (pl. GT 710). A <span class="ui">CPU only</span> beállítás mindkét változatban a processzort kényszeríti.</p>
+<h3>Mit jelent ez a gyakorlatban?</h3>
+<ul>
+  <li><b>Sebesség:</b> egy modern NVIDIA kártyán (pl. RTX sorozat) a szétválasztás nagyjából 10–50-szer gyorsabb.
+      Egy dal jóval egy perc alatt elkészül, CPU-n ez több perc.</li>
+  <li><b>Eredmény:</b> ugyanaz a modell ugyanazokkal a beállításokkal mindkét változatban gyakorlatilag ugyanazt adja.
+      Apró lebegőpontos eltérések előfordulhatnak, de nem hallhatók.</li>
+  <li><b>Modellek:</b> a <code>models</code> mappa átmásolható a két változat között, nem kell újra letölteni semmit.</li>
+  <li><b>Melyiket válaszd:</b> ha nincs NVIDIA kártyád, a CPU-s változatot. Kisebb, és ugyanazt tudja.</li>
+</ul>
+<div class="note">A GPU-s változat túl nagy a GitHub Release-hez. A forráskódból a <code>build.bat gpu</code> paranccsal készíthető el.</div>
+
+<h2 id="files">8. Fájlok és mappák</h2>
+<p>Minden a <code>StemSplitter.exe</code> mellett tárolódik, így a teljes mappa másolható vagy áthelyezhető:</p>
+<pre>StemSplitter\
+├── StemSplitter.exe
+├── models\          letöltött modellfájlok
+├── output\          alapértelmezett kimeneti mappa
+├── ffmpeg\          hangdekóder/-kódoló
+├── jobs.json        a mentett feladatsor
+└── settings.json    a beállításaid</pre>
+<p>Ha tiszta lappal szeretnél kezdeni, töröld a <code>jobs.json</code> és a <code>settings.json</code> fájlt.
+A <code>models</code> mappa törlésével helyet szabadíthatsz fel. A modelleket a program szükség esetén újra letölti.</p>
+
+<h2 id="trouble">9. Hibaelhárítás</h2>
+<table>
+  <tr><th>Probléma</th><th>Megoldás</th></tr>
+  <tr><td>Nagyon lassú a szétválasztás</td><td>CPU-n ez normális: egy dal modellenként több percig tarthat, <i>Best</i> minőségben
+      tovább is. Használd a <i>Fast</i> vagy <i>Normal</i> minőséget, vagy NVIDIA kártyával a GPU-s változatot.</td></tr>
+  <tr><td>A GPU-s változat a CPU-t használja</td><td>Nézd meg a feladat naplóját: kiírja, miért nem használta a GPU-t
+      (nincs CUDA GPU, nem támogatott kártya, …). Frissítsd az NVIDIA drivert legalább az 570-es verzióra.</td></tr>
+  <tr><td>Nem sikerül letölteni egy modellt</td><td>Ellenőrizd az internetkapcsolatot, majd próbáld újra:
+      <span class="ui">⟳ Models</span> → <span class="ui">⬇ Download missing</span>. Tűzfal vagy proxy is blokkolhatja a letöltést.</td></tr>
+  <tr><td>Egy feladat hibával leállt</td><td>Jelöld ki, és olvasd el a napló utolsó sorait. Gyakori okok: sérült vagy nem támogatott
+      bemeneti fájl, kevés lemezhely vagy memória. Az ok elhárítása után nyomd meg a <span class="ui">↻ Retry</span> gombot.</td></tr>
+  <tr><td>Nem működik a fogd és vidd</td><td>Használd az <span class="ui">Add files…</span> / <span class="ui">Add folder…</span> gombot.
+      A Windows a rendszergazdaként és normál módon futó programok között nem engedi a fogd és vidd műveletet.</td></tr>
+  <tr><td>Nem indul a program</td><td>Ellenőrizd, hogy a teljes mappát kicsomagoltad-e (ne a zip-ből futtasd az exe-t),
+      és hogy a vírusirtó nem tett-e karanténba fájlokat.</td></tr>
+</table>
+
+<h2>Jogi megjegyzés</h2>
+<p>A modellfájlok az eredeti forrásukból töltődnek le, és a saját licencük vonatkozik rájuk.
+Csak olyan hanganyagot bonts szét, amelynek felhasználására jogod van. Maga a StemSplitter nyílt forráskódú (MIT):
+<a href="https://github.com/kirlaca/stem-splitter">github.com/kirlaca/stem-splitter</a>.</p>
+</main>
+</body>
+</html>

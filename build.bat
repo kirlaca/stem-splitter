@@ -26,7 +26,7 @@ if not exist %VENV% py -3.10 -m venv %VENV%
 for %%K in (%KEEP%) do if exist %OUT%\%%K move %OUT%\%%K _keep_%%K >nul
 
 %VENV%\Scripts\pyinstaller.exe --noconfirm --clean --windowed --name StemSplitter ^
-  --icon assets\icon.ico --add-data "assets\icon.png;assets" ^
+  --icon assets\icon.ico --add-data "assets\icon.png;assets" --add-data "docs\user_guide_*.html;docs" ^
   --distpath dist\_build --workpath build\%OUTNAME% ^
   --collect-all audio_separator --collect-all librosa --collect-all beartype ^
   --collect-all rotary_embedding_torch --collect-all einops --collect-all julius ^

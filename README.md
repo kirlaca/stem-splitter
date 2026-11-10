@@ -23,9 +23,12 @@ is available, and has a modern light/dark UI.
 - **Model manager.** See which models are downloaded, pre-download missing ones (e.g. before going
   offline) or re-download them. Updates run as queue jobs; a failed download keeps the old file.
 - **Portable.** Models, output, queue and settings all live next to the exe. Copy the folder anywhere.
+- **Built-in user guide** in English and Hungarian (**? Help** button):
+  [English](https://htmlpreview.github.io/?https://github.com/kirlaca/stem-splitter/blob/main/docs/user_guide_en.html) ·
+  [Magyar](https://htmlpreview.github.io/?https://github.com/kirlaca/stem-splitter/blob/main/docs/user_guide_hu.html)
 
 ## Download & run
-**[⬇ Download StemSplitter v1.0.0 (CPU build, 338 MB)](https://github.com/kirlaca/stem-splitter/releases/download/v1.0.0/StemSplitter-v1.0.0-win64-cpu.zip)**
+**[⬇ Download StemSplitter v1.0.1 (CPU build, 338 MB)](https://github.com/kirlaca/stem-splitter/releases/download/v1.0.1/StemSplitter-v1.0.1-win64-cpu.zip)**
 — or see [all releases](https://github.com/kirlaca/stem-splitter/releases).
 
 Extract the zip anywhere and run `StemSplitter.exe`. No installation or Python needed.
@@ -77,6 +80,7 @@ next to the exe. `models`, `output`, `jobs.json` and `settings.json` are preserv
 | `worker.py` | separation / model download, run in a child process per job |
 | `build.bat` | portable build (CPU or GPU) |
 | `assets/` | app icon (`make_icon.py` regenerates it) |
+| `docs/` | user guide (EN/HU, bundled into the exe) and screenshots |
 
 ## Credits
 - [python-audio-separator](https://github.com/nomadkaraoke/python-audio-separator) – model runner (MIT)

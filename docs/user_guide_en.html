@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StemSplitter – User Guide</title>
+<style>
+  :root { --bg:#fafafa; --fg:#1c1c1c; --muted:#5f5f5f; --card:#fff; --line:#e3e3e3; --accent:#0067c0; --note:#eef5fc; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#1c1c1c; --fg:#e8e8e8; --muted:#a8a8a8; --card:#262626; --line:#3a3a3a; --accent:#57a6ff; --note:#1f2b38; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.6 "Segoe UI", system-ui, sans-serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 32px 24px 64px; }
+  h1 { font-size: 30px; margin: 0 0 4px; }
+  h2 { font-size: 21px; margin: 40px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+  h3 { font-size: 16px; margin: 22px 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 18px; }
+  .lang { float: right; font-size: 14px; }
+  a { color: var(--accent); }
+  nav { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px 20px; }
+  nav ol { margin: 0; padding-left: 20px; columns: 2; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; background: var(--card); }
+  th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--note); }
+  code, kbd { font-family: Consolas, monospace; font-size: 13.5px; background: var(--note); padding: 1px 5px; border-radius: 4px; }
+  .note { background: var(--note); border-left: 4px solid var(--accent); padding: 10px 14px; border-radius: 4px; margin: 14px 0; }
+  .ui { font-weight: 600; white-space: nowrap; }
+  pre { background: var(--card); border: 1px solid var(--line); padding: 10px 14px; border-radius: 6px; }
+</style>
+</head>
+<body>
+<main>
+<div class="lang"><a href="user_guide_hu.html">Magyar változat »</a></div>
+<h1>StemSplitter – User Guide</h1>
+<p class="sub">AI music source separation for Windows · BS-RoFormer &amp; Demucs</p>
+
+<nav><ol>
+  <li><a href="#start">Getting started</a></li>
+  <li><a href="#models">Choosing a model</a></li>
+  <li><a href="#workflow">Separating songs step by step</a></li>
+  <li><a href="#options">Output options</a></li>
+  <li><a href="#queue">The job queue</a></li>
+  <li><a href="#manager">Model manager</a></li>
+  <li><a href="#builds">CPU build vs. GPU build</a></li>
+  <li><a href="#files">Files and folders</a></li>
+  <li><a href="#trouble">Troubleshooting</a></li>
+</ol></nav>
+
+<h2 id="start">1. Getting started</h2>
+<p>StemSplitter is portable, so there is nothing to install. Extract the folder anywhere (a USB drive works too)
+and run <code>StemSplitter.exe</code>. Python is not needed.</p>
+<p>The first time you use a model, the app downloads it into the <code>models</code> folder. After that it
+works offline. To download every model in advance, use <span class="ui">⟳ Models</span> → <span class="ui">⬇ Download missing</span>.</p>
+<p>The <span class="ui">☀ Light / ☾ Dark</span> button in the top right switches the theme. The <span class="ui">? Help</span> button
+opens this guide.</p>
+
+<h2 id="models">2. Choosing a model</h2>
+<table>
+  <tr><th>Option in the app</th><th>Stems produced</th><th>Best for</th><th>Download</th></tr>
+  <tr><td><b>Vocals / Instrumental</b><br>BS-RoFormer</td><td>vocals, instrumental</td>
+      <td>The cleanest vocal isolation: karaoke tracks, a cappella, remixes</td><td>~640 MB</td></tr>
+  <tr><td><b>4 stems</b><br>Demucs htdemucs_ft</td><td>vocals, drums, bass, other</td>
+      <td>The best 4-stem quality, e.g. for practising along with the band. Slower: it runs 4 specialised models.</td><td>~340 MB</td></tr>
+  <tr><td><b>6 stems</b><br>Demucs htdemucs_6s</td><td>vocals, drums, bass, other, guitar, piano</td>
+      <td>When you need the guitar or piano separately. Guitar and piano are less clean than the other stems.</td><td>~55 MB</td></tr>
+</table>
+<div class="note">Tip: for the vocals alone, use RoFormer. For the instruments, use one of the Demucs models.
+You can queue the same song with several models.</div>
+
+<h2 id="workflow">3. Separating songs step by step</h2>
+<ol>
+  <li><b>Input:</b> drag audio files or whole folders onto the drop area. You can also click it, or use
+      <span class="ui">Add files…</span> / <span class="ui">Add folder…</span>. <span class="ui">Clear</span> empties the list.
+      Supported formats: MP3, WAV, FLAC, M4A, OGG, AAC, WMA, OPUS, AIFF.</li>
+  <li><b>Model:</b> pick one of the three models (see above).</li>
+  <li><b>Output:</b> tick the stems you want to keep, then choose the folder, format, quality and device.</li>
+  <li>Click <span class="ui">＋ Add to queue</span>. Every file becomes a separate job.</li>
+  <li>Click <span class="ui">▶ Start</span>. Progress shows below the queue. When a job is done, double-click it to open its folder.</li>
+</ol>
+
+<h2 id="options">4. Output options</h2>
+<table>
+  <tr><th>Setting</th><th>Meaning</th></tr>
+  <tr><td class="ui">Stems</td><td>Only the ticked stems are saved; the rest are deleted after separation.</td></tr>
+  <tr><td class="ui">Folder</td><td>Where results go. Default: the <code>output</code> folder next to the app.</td></tr>
+  <tr><td class="ui">Separate folder per song</td><td>On: <code>output\My Song\vocals.wav</code>.
+      Off: <code>output\My Song_vocals.wav</code>.</td></tr>
+  <tr><td class="ui">Format</td><td>WAV (lossless, large), FLAC (lossless, smaller) or MP3 (320 kbps).</td></tr>
+  <tr><td class="ui">Quality</td><td><b>Fast / Normal / Best</b>. Higher quality takes proportionally longer.
+      For Demucs it sets the number of “shifts” (1 / 2 / 5). For RoFormer it sets the overlap (2 / 4 / 8).
+      <i>Best</i> is about 2–3× slower than <i>Normal</i> and the difference is small. <i>Normal</i> is a good default.</td></tr>
+  <tr><td class="ui">Device</td><td><b>Auto (GPU if available)</b> uses an NVIDIA GPU if it works, otherwise the CPU.
+      <b>CPU only</b> always uses the processor. See <a href="#builds">CPU vs. GPU build</a>.</td></tr>
+</table>
+<p>Settings are remembered between sessions. Each job keeps the settings it was added with, so changing them
+later does not affect jobs already in the queue.</p>
+
+<h2 id="queue">5. The job queue</h2>
+<p>Jobs run one at a time, in order. Each job runs in its own process, so it can be stopped at any moment.</p>
+<table>
+  <tr><th>Control</th><th>What it does</th></tr>
+  <tr><td class="ui">▶ Start</td><td>Starts processing the waiting jobs.</td></tr>
+  <tr><td class="ui">⏸ Pause after current</td><td>Lets the running job finish, then stops the queue.</td></tr>
+  <tr><td class="ui">■ Stop current</td><td>Kills the running job immediately (status: <i>Stopped</i>).</td></tr>
+  <tr><td class="ui">Resume on launch</td><td>When on, waiting jobs start automatically the next time the app opens.</td></tr>
+  <tr><td class="ui">↻ Retry</td><td>Puts the selected finished, failed or stopped jobs back to <i>Waiting</i>, e.g. to run them again.</td></tr>
+  <tr><td class="ui">▲ ▼</td><td>Move the selected job up or down in the queue.</td></tr>
+  <tr><td class="ui">✕ Remove</td><td>Removes the selected jobs (or press <kbd>Delete</kbd>).</td></tr>
+  <tr><td class="ui">Clear finished</td><td>Removes all done, failed and stopped jobs from the list.</td></tr>
+  <tr><td class="ui">📁 Open output</td><td>Opens the selected job's result folder (or double-click the job). With nothing selected, it opens the output folder.</td></tr>
+</table>
+<p>Job statuses: <b>○ Waiting</b>, <b>▶ Running</b>, <b>✔ Done</b>, <b>✖ Failed</b>, <b>■ Stopped</b>.
+While a job runs, the <i>Info</i> column shows its phase and progress. Afterwards it shows the number of stems, the run time and the device used (CPU or the GPU's name).
+Select a job to see its detailed log in the <b>Log</b> panel at the bottom.
+The queue is saved and is still there after you close and reopen the app.</p>
+
+<h2 id="manager">6. Model manager</h2>
+<p><span class="ui">⟳ Models</span> lists the three models with their download status, size and date.</p>
+<ul>
+  <li><span class="ui">⬇ Download missing</span>: downloads every model that is not on disk yet. Use it before going offline.</li>
+  <li><span class="ui">⟳ Re-download selected</span>: downloads the selected models again, to update or repair them.
+      The old file is kept until the new one has arrived, so a failed download doesn't leave you without a model.</li>
+  <li><span class="ui">📁 Folder</span>: opens the <code>models</code> folder.</li>
+</ul>
+<p>Downloads also run as queue jobs. They are placed in front of the waiting separation jobs, and their progress
+shows in the queue.</p>
+
+<h2 id="builds">7. CPU build vs. GPU build</h2>
+<p>There are two builds of StemSplitter. <b>Both use exactly the same three models and the same program code.</b>
+They differ only in the computing libraries bundled with them:</p>
+<table>
+  <tr><th></th><th>CPU build (<code>StemSplitter</code>)</th><th>GPU build (<code>StemSplitter-GPU</code>)</th></tr>
+  <tr><td>PyTorch</td><td>2.8.0, CPU-only</td><td>2.8.0 with CUDA 12.8 (CUDA/cuDNN libraries included)</td></tr>
+  <tr><td>ONNX Runtime</td><td><code>onnxruntime</code></td><td><code>onnxruntime-gpu</code></td></tr>
+  <tr><td>Size</td><td>~0.9 GB</td><td>~5 GB (almost all of the difference is the CUDA libraries)</td></tr>
+  <tr><td>Hardware</td><td>Any 64-bit Windows 10/11 PC</td><td>NVIDIA GPU, GTX 900 series or newer, driver 570 or newer</td></tr>
+  <tr><td>Uses the GPU</td><td>Never</td><td>Automatically, when a usable card is found</td></tr>
+</table>
+<h3>How the GPU build picks the device</h3>
+<p>At the start of every job, the GPU build runs a small test calculation on the graphics card. If it works,
+the job runs on the GPU and the <i>Info</i> column shows the card's name. If it fails, the job runs on the CPU
+exactly like the CPU build does. This happens with no NVIDIA card, an outdated driver, or a card too old for
+current PyTorch (for example a GT 710). Choosing <span class="ui">CPU only</span> forces the CPU in either build.</p>
+<h3>What this means in practice</h3>
+<ul>
+  <li><b>Speed:</b> on a modern NVIDIA card (e.g. RTX series) separation is roughly 10–50× faster.
+      A song takes well under a minute, compared with several minutes on a CPU.</li>
+  <li><b>Result:</b> the same model with the same settings gives practically the same output in both builds.
+      Tiny floating-point differences are possible but not audible.</li>
+  <li><b>Models:</b> you can copy the <code>models</code> folder between the two builds, so nothing needs to be
+      downloaded again.</li>
+  <li><b>Which one to use:</b> without an NVIDIA card, use the CPU build. It is smaller and does the same job.</li>
+</ul>
+<div class="note">The GPU build is too large for GitHub releases. You can create it from the source code with
+<code>build.bat gpu</code>.</div>
+
+<h2 id="files">8. Files and folders</h2>
+<p>Everything is stored next to <code>StemSplitter.exe</code>, so you can copy or move the whole folder:</p>
+<pre>StemSplitter\
+├── StemSplitter.exe
+├── models\          downloaded model files
+├── output\          default result folder
+├── ffmpeg\          audio decoder/encoder
+├── jobs.json        the saved queue
+└── settings.json    your settings</pre>
+<p>To start over, delete <code>jobs.json</code> and <code>settings.json</code>. Delete the <code>models</code> folder
+to free disk space; the models are downloaded again when needed.</p>
+
+<h2 id="trouble">9. Troubleshooting</h2>
+<table>
+  <tr><th>Problem</th><th>Solution</th></tr>
+  <tr><td>Separation is very slow</td><td>That is normal on a CPU: a song can take several minutes per model, and longer
+      at <i>Best</i>. Use <i>Fast</i> or <i>Normal</i>, or the GPU build with an NVIDIA card.</td></tr>
+  <tr><td>The GPU build uses the CPU</td><td>Check the job's log. It says why the GPU wasn't used (no CUDA GPU, card not
+      supported, …). Update the NVIDIA driver to version 570 or newer.</td></tr>
+  <tr><td>A model download fails</td><td>Check the internet connection and try <span class="ui">⟳ Models</span> →
+      <span class="ui">⬇ Download missing</span> again. A firewall or proxy may block the download.</td></tr>
+  <tr><td>A job failed</td><td>Select it and read the last lines of the log. Common causes: a damaged or unsupported
+      input file, or not enough disk space or memory. Fix the cause and press <span class="ui">↻ Retry</span>.</td></tr>
+  <tr><td>Drag &amp; drop does not work</td><td>Use <span class="ui">Add files…</span> / <span class="ui">Add folder…</span>.
+      Windows also blocks drag &amp; drop between programs running as administrator and normal programs.</td></tr>
+  <tr><td>The app won't start</td><td>Make sure the whole folder was extracted (don't run the exe from inside the zip),
+      and that your antivirus did not quarantine any files.</td></tr>
+</table>
+
+<h2>Legal note</h2>
+<p>The model weights are downloaded from their original sources and stay under their own licenses.
+Only separate audio you have the rights to use. StemSplitter itself is open source (MIT):
+<a href="https://github.com/kirlaca/stem-splitter">github.com/kirlaca/stem-splitter</a>.</p>
+</main>
+</body>
+</html>
